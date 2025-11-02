@@ -1,0 +1,30 @@
+# --- Python / FastAPI ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Environment variables ---
+.env
+
+# --- Local artifacts ---
+artifacts/
+!artifacts/README.md   # (optional placeholder if you want)
+
+# --- Editor / OS junk ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Byte-compiled cache ---
+*.log
+
