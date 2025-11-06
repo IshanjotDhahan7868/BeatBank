@@ -1,30 +1,95 @@
-# --- Python / FastAPI ---
+# ========================
+# Python / FastAPI Backend
+# ========================
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 *.db
 *.sqlite3
-
-# --- Virtual environments ---
+*.log
+*.pot
+*.pyc
+*.pkl
+*.egg-info/
+.env
+.env.*
 .venv/
 venv/
-env/
-ENV/
-
-# --- Environment variables ---
-.env
-
-# --- Local artifacts ---
-artifacts/
-!artifacts/README.md   # (optional placeholder if you want)
-
-# --- Editor / OS junk ---
+dist/
+build/
+tmp/
+.DS_Store
 .idea/
 .vscode/
+
+# Artifacts & Generated Media
+backend/artifacts/
+artifacts/
+*.mp3
+*.wav
+*.png
+*.jpg
+*.mp4
+*.avi
+*.mov
+*.webm
+
+# ========================
+# Node / React Frontend
+# ========================
+node_modules/
+dist/
+build/
+.cache/
+coverage/
+*.tsbuildinfo
+
+# Vite
+.vite/
+.vite_deps/
+vite.config.ts.timestamp*
+
+# npm / yarn / pnpm
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
 .DS_Store
 Thumbs.db
 
-# --- Byte-compiled cache ---
-*.log
+# ========================
+# Supabase / API Keys
+# ========================
+supabase/.temp/
+supabase/.env
+backend/config.py.bak
+.env.local
+.env.development
+.env.production
+.env.test
+
+# ========================
+# IDEs / Editors
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========================
+# Output / Uploads
+# ========================
+output/
+uploads/
+input/
+__temp__/
+__cache__/
 
