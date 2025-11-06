@@ -1,11 +1,11 @@
-# Railway Railpack will detect Python. We only need ffmpeg.
 [phases.setup]
-nixPkgs = ["ffmpeg"]
+nixPkgs = ["ffmpeg", "libsndfile"]   # <- important for moviepy/librosa
 
-# Install deps from the requirements that live in backend/
 [phases.install]
-commands = ["pip install --upgrade pip", "pip install -r requirements.txt"]
+cmds = [
+  "pip install --upgrade pip",
+  "pip install -r requirements.txt"
+]
 
-# Start the FastAPI app inside backend/ (main.py exports app)
-[start]
-cmd = "uvicorn main:app --host 0.0.0.0 --port 8000"
+[processes]
+web = "uvicorn main:app --host 0.0.0.0 --port $PORT"
