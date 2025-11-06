@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-aiofiles
-python-multipart
-openai
-python-dotenv
-supabase
-moviepy
-imageio[ffmpeg]
