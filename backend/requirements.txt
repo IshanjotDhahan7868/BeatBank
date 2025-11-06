@@ -6,11 +6,10 @@ python-multipart
 openai
 python-dotenv
 supabase
+moviepy
 imageio[ffmpeg]
-python-dotenv
 librosa
 soundfile
 numpy
 scipy
 replicate
-moviepy
