@@ -52,6 +52,7 @@ _http: Optional[httpx.AsyncClient] = None
 
 # Mount artifacts folder for public serving
 ARTIFACTS_DIR = os.path.join(os.path.dirname(__file__), "artifacts")
+os.makedirs(ARTIFACTS_DIR, exist_ok=True)  # <-- add this line
 app.mount("/artifacts", StaticFiles(directory=ARTIFACTS_DIR), name="artifacts")
 
 
