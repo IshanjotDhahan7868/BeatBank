@@ -1,10 +1,12 @@
 [phases.setup]
-nixPkgs = ["ffmpeg", "libsndfile"]   # <- important for moviepy/librosa
+nixPkgs = ["ffmpeg", "libsndfile"]
 
 [phases.install]
 cmds = [
+  "python --version",
   "pip install --upgrade pip",
-  "pip install -r requirements.txt"
+  "pip install -r requirements.txt",
+  "python -c \"import moviepy, sys; print('moviepy', moviepy.__version__)\""
 ]
 
 [processes]
