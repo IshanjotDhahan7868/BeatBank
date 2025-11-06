@@ -1,13 +1,11 @@
 [phases.setup]
-nixPkgs = ["ffmpeg", "python310"]
+nixPkgs = ["ffmpeg"]
 
-[phases.install]
+[phases.build]
 commands = [
-  "python3.10 -m venv /app/.venv",
-  "/app/.venv/bin/pip install --upgrade pip",
-  "/app/.venv/bin/pip install -r backend/requirements.txt"
+  "pip install --upgrade pip",
+  "pip install -r requirements.txt"
 ]
 
 [start]
-cmd = "/app/.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000"
-
+cmd = "uvicorn main:app --host 0.0.0.0 --port 8000"
