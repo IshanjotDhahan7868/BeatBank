@@ -1,21 +1,17 @@
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-    libsndfile1 \
-    libgl1 \
+    ffmpeg libsndfile1 libgl1 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY backend/requirements.txt ./requirements.txt
+COPY requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
-COPY backend/ /app/
-
-RUN mkdir -p /app/artifacts
+COPY . /app/
 
 EXPOSE 8000
 
