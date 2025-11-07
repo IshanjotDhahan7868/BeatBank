@@ -30,6 +30,8 @@ from config import (
 )
 
 from providers.music_replicate import generate_elevenlabs_music
+os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+
 
 # Init
 log = setup_logger()
