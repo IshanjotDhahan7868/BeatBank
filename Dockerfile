@@ -1,6 +1,5 @@
 FROM python:3.11-slim
 
-# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libsndfile1 \
@@ -9,20 +8,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Copy requirements first
 COPY backend/requirements.txt ./requirements.txt
 
-# FIX: Install moviepy + imageio + imageio-ffmpeg manually
-RUN pip install --upgrade pip
-RUN pip install moviepy imageio imageio-ffmpeg
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
 
-# Install your other deps
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the backend code
 COPY backend/ /app/
 
-# Ensure folder exists
 RUN mkdir -p /app/artifacts
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
