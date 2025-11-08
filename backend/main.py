@@ -95,9 +95,6 @@ class MetadataResponse(BaseModel):
 def root():
     return {"message": "BeatBank API is running 🚀"}
 
-@app.get("/healthz")
-def healthz():
-    return {"ok": True}
 
 # ----------------------------
 # Upload
