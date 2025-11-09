@@ -1,92 +1,21 @@
 // src/lib/api.ts
+import axios from "axios";
 
-// ✅ Load API base URL from environment variable (.env)
-export const API_URL = import.meta.env.VITE_API_URL;
+// ✅ Environment variable from Vercel (.env)
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// ✅ Helper: always ensure API_URL exists
-if (!API_URL) {
-  console.warn(
-    "⚠️ VITE_API_URL is missing! Add it to your frontend/.env file."
-  );
+// ✅ Safety check
+if (!API_BASE_URL) {
+  console.warn("⚠️ VITE_API_BASE_URL is missing! Add it in Vercel → Environment Variables.");
 }
 
-// --------------------------------------------------------------
-// ✅ Upload Beat (POST /api/upload)
-// --------------------------------------------------------------
+// ✅ Axios instance (this is what GenerateDashboardFinal expects)
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
 
-export async function uploadBeat(formData: FormData) {
-  const response = await fetch(`${API_URL}/api/upload`, {
-    method: "POST",
-    body: formData,
-  });
+// ✅ Default export (your component imports: `import api from "../lib/api"`)
+export default api;
 
-  if (!response.ok) {
-    throw new Error("Upload failed");
-  }
-
-  return response.json();
-}
-
-// --------------------------------------------------------------
-// ✅ Generate Metadata (POST /api/metadata)
-// --------------------------------------------------------------
-
-export async function generateMetadata(data: any) {
-  const response = await fetch(`${API_URL}/api/metadata`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error("Metadata generation failed");
-  }
-
-  return response.json();
-}
-
-// --------------------------------------------------------------
-// ✅ Generate Visualizer (POST /api/visualizer)
-// --------------------------------------------------------------
-
-export async function generateVisualizer(data: any) {
-  const response = await fetch(`${API_URL}/api/visualizer`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error("Visualizer generation failed");
-  }
-
-  return response.json();
-}
-
-// --------------------------------------------------------------
-// ✅ Get History (GET /api/history)
-// --------------------------------------------------------------
-
-export async function getHistory() {
-  const response = await fetch(`${API_URL}/api/history`);
-
-  if (!response.ok) {
-    throw new Error("Failed to load history");
-  }
-
-  return response.json();
-}
-
-// --------------------------------------------------------------
-// ✅ Get Details (GET /api/detail/:id)
-// --------------------------------------------------------------
-
-export async function getDetail(id: string) {
-  const response = await fetch(`${API_URL}/api/detail/${id}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch detail");
-  }
-
-  return response.json();
-}
+// ✅ Named export for building full URLs (for displaying image/audio/video)
+export { API_BASE_URL };
