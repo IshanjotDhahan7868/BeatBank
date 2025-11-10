@@ -9,13 +9,10 @@ if (!API_BASE_URL) {
   console.warn("⚠️ VITE_API_BASE_URL is missing! Add it in Vercel → Environment Variables.");
 }
 
-// ✅ Axios instance (this is what GenerateDashboardFinal expects)
+// ✅ Axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// ✅ Default export (your component imports: `import api from "../lib/api"`)
+// ✅ Default export
 export default api;
-
-// ✅ Named export for building full URLs (for displaying image/audio/video)
-export { API_BASE_URL };
