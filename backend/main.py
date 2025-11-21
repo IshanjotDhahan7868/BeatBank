@@ -291,16 +291,49 @@ async def ai_video_endpoint(
     
 
 # ----------------------------
-# HISTORY
+# HISTORY (fixed)
 # ----------------------------
 @app.get("/api/history")
 async def get_history():
     try:
-        res = supabase.table("beats").select("*").order("created_at", desc=True).execute()
-        return {"status": "success", "data": res.data}
+        res = supabase.table("beats").select("*").order("id", desc=True).execute()
+        rows = res.data or []
+
+        cleaned = []
+        for r in rows:
+            # Handle cases where title or tags are stored as JSON text
+            title = r.get("title")
+            tags = r.get("tags")
+            desc = r.get("description")
+
+            # try parsing JSON if stored as string
+            if isinstance(title, str) and title.strip().startswith("{"):
+                try:
+                    parsed = json.loads(title)
+                    title = parsed.get("title", title)
+                    tags = parsed.get("tags", tags)
+                    desc = parsed.get("description", desc)
+                except Exception:
+                    pass
+
+            cleaned.append({
+                "id": r.get("id"),
+                "title": title or "Untitled",
+                "tags": tags or [],
+                "description": desc or "",
+                "image_path": r.get("image_path"),
+                "video_path": r.get("video_path"),
+                "ai_video_path": r.get("ai_video_path"),
+                "file_name": r.get("file_name"),
+                "created_at": r.get("created_at"),
+            })
+
+        return {"status": "success", "data": cleaned}
+
     except Exception as e:
         log.exception("History fetch failed")
         raise HTTPException(500, f"History fetch error: {e}")
+
 
 
 
