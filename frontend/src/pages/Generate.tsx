@@ -1,14 +1,12 @@
-// ✅ FULLY FIXED, CLEAN, WORKING Generate.tsx
-// ✅ UI preserved
-// ✅ Correct imports
-// ✅ Correct API_BASE_URL usage
-// ✅ No TypeScript or JSX errors
+// src/pages/Generate.tsx
 
 import { useState, useRef } from "react";
 import api, { API_BASE_URL } from "../lib/api";
-
+import { useAuth } from "../context/AuthContext";   // 🔥 ADDED
 
 export default function Generate() {
+  const { user } = useAuth();                       // 🔥 ADDED
+
   const [prompt, setPrompt] = useState("");
 
   const [doMetadata, setDoMetadata] = useState(true);
@@ -67,9 +65,18 @@ export default function Generate() {
 
     try {
       log("Sending to backend…");
-      const { data } = await api.post("/api/auto", form, { signal: controller.signal });
+
+      // 🟣 SEND USER ID TO BACKEND
+      const { data } = await api.post("/api/auto", form, {
+        signal: controller.signal,
+        headers: {
+          "x-user-id": user?.id || "",
+        },
+      });
+
       log("✅ Generation complete");
       setResult(data);
+
     } catch (err: any) {
       if (err.name === "AbortError") log("❌ Cancelled");
       else {
@@ -89,6 +96,8 @@ export default function Generate() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex">
+      
+      {/* LEFT SIDEBAR */}
       <aside className="w-60 bg-gray-900 p-6 space-y-4 border-r border-gray-800">
         <h1 className="text-xl font-bold">BeatBank</h1>
         <nav className="space-y-2">
@@ -98,13 +107,15 @@ export default function Generate() {
         </nav>
       </aside>
 
+      {/* MAIN AREA */}
       <main className="flex-1 p-8 overflow-y-auto space-y-8">
         <h2 className="text-3xl font-bold">Generate Beat</h2>
 
         <div className="grid grid-cols-2 gap-6">
           {/* LEFT SIDE */}
           <div className="space-y-6">
-            {/* ✅ Prompt */}
+
+            {/* 🔹 Prompt */}
             <div className="bg-gray-900 p-4 rounded-xl space-y-3">
               <h3 className="font-bold">Prompt</h3>
               <textarea
@@ -115,7 +126,7 @@ export default function Generate() {
               />
             </div>
 
-            {/* ✅ Steps */}
+            {/* 🔹 Steps */}
             <div className="bg-gray-900 p-4 rounded-xl space-y-2">
               <h3 className="font-bold">Steps</h3>
               <label><input type="checkbox" checked={doMetadata} onChange={e=>setDoMetadata(e.target.checked)} /> Metadata</label><br/>
@@ -125,7 +136,7 @@ export default function Generate() {
               <label><input type="checkbox" checked={doAIVideo} onChange={e=>setDoAIVideo(e.target.checked)} /> AI Video</label>
             </div>
 
-            {/* ✅ Providers + Duration */}
+            {/* 🔹 Providers */}
             <div className="bg-gray-900 p-4 rounded-xl space-y-4">
               <div>
                 <h3 className="font-bold">Music Provider</h3>
@@ -161,7 +172,7 @@ export default function Generate() {
               </div>
             </div>
 
-            {/* ✅ Visualizer FX */}
+            {/* 🔹 Visualizer FX */}
             <div className="bg-gray-900 p-4 rounded-xl space-y-2">
               <h3 className="font-bold">Visualizer FX</h3>
               <label><input type="checkbox" checked={waveform} onChange={e=>setWaveform(e.target.checked)} /> Waveform</label><br/>
@@ -171,7 +182,7 @@ export default function Generate() {
               <label><input type="checkbox" checked={vhs} onChange={e=>setVhs(e.target.checked)} /> VHS</label>
             </div>
 
-            {/* ✅ Buttons */}
+            {/* 🔹 Buttons */}
             <button className="bg-purple-600 px-4 py-2 rounded w-full" onClick={generate} disabled={loading}>
               {loading ? "Generating…" : "Generate"}
             </button>
@@ -182,15 +193,16 @@ export default function Generate() {
             {error && <div className="text-red-400">{error}</div>}
           </div>
 
-          {/* ✅ RIGHT SIDE */}
+          {/* RIGHT SIDE */}
           <div className="space-y-6">
-            {/* ✅ Logs */}
+
+            {/* Logs */}
             <div className="bg-gray-900 p-4 rounded-xl h-40 overflow-y-auto text-sm space-y-1">
               <h3 className="font-bold mb-1">Logs</h3>
               {logs.map((l, i) => <div key={i}>{l}</div>)}
             </div>
 
-            {/* ✅ Results */}
+            {/* Results */}
             {result && (
               <div className="space-y-6">
 

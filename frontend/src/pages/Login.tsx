@@ -1,0 +1,50 @@
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return toast.error(error.message);
+
+    toast.success("Logged in!");
+    navigate("/generate");
+  }
+
+  return (
+    <div className="p-10 max-w-md mx-auto text-white">
+      <h1 className="text-3xl font-bold mb-6">Login</h1>
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-3 rounded bg-gray-800"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-3 rounded bg-gray-800"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button className="w-full bg-purple-600 p-3 rounded font-semibold">
+          Login
+        </button>
+      </form>
+    </div>
+  );
+}

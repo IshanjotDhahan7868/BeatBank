@@ -389,6 +389,7 @@ async def get_history():
 # ----------------------------
 @app.post("/api/auto")
 async def auto_chain(
+    request: Request,
     prompt: str = Form(...),
     do_metadata: bool = Form(True),
     do_image: bool = Form(True),
@@ -508,31 +509,36 @@ async def auto_chain(
         except Exception as e:
             log.warning(f"Visualizer failed: {e}")
 
-    # ----------------------------
-    # 7) SAVE TO SUPABASE
-    # ----------------------------
-    try:
-        dsp = result["dsp"] or {}
-        supabase.table("beats").insert({
-            "file_name": (result["audio_paths"] or [None])[-1],
-            "title": title[:50],
-            "tags": result["metadata"]["tags"] if result["metadata"] else ["ai"],
-            "description": desc,
-            "image_path": result["image_path"],
-            "video_path": result.get("video_path"),
-            "ai_video_path": result.get("ai_video_path"),
+# ----------------------------
+# 7) SAVE TO SUPABASE
+# ----------------------------
+try:
+    user_id = request.headers.get("x-user-id")  # 🔥 ADDED
 
-            # DSP fields
-            "bpm": dsp.get("bpm"),
-            "key": dsp.get("key"),
-            "energy": dsp.get("energy_rms"),
-            "brightness": dsp.get("brightness"),
-            "dynamic_range": dsp.get("dynamic_range"),
-            "tempo_stability": dsp.get("tempo_stability"),
-            "duration_sec": dsp.get("duration_sec"),
-        }).execute()
-    except Exception as e:
-        log.info(f"Supabase insert (non-fatal): {e}")
+    dsp = result["dsp"] or {}
+
+    supabase.table("beats").insert({
+        "user_id": user_id,                                  # 🔥 ADDED
+        "file_name": (result["audio_paths"] or [None])[-1],
+        "title": title[:50],
+        "tags": result["metadata"]["tags"] if result["metadata"] else ["ai"],
+        "description": desc,
+        "image_path": result["image_path"],
+        "video_path": result.get("video_path"),
+        "ai_video_path": result.get("ai_video_path"),
+
+        # DSP
+        "bpm": dsp.get("bpm"),
+        "key": dsp.get("key"),
+        "energy": dsp.get("energy_rms"),
+        "brightness": dsp.get("brightness"),
+        "dynamic_range": dsp.get("dynamic_range"),
+        "tempo_stability": dsp.get("tempo_stability"),
+        "duration_sec": dsp.get("duration_sec"),
+    }).execute()
+
+except Exception as e:
+    log.info(f"Supabase insert (non-fatal): {e}")
 
     # ----------------------------
     # RETURN EVERYTHING
