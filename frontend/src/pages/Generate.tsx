@@ -5,7 +5,8 @@
 // ✅ No TypeScript or JSX errors
 
 import { useState, useRef } from "react";
-import { api, API_BASE_URL } from "../lib/api";
+import api, { API_BASE_URL } from "../lib/api";
+
 
 export default function Generate() {
   const [prompt, setPrompt] = useState("");
