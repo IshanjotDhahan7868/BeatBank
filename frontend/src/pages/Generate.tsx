@@ -137,7 +137,7 @@ export default function Generate() {
 
               {doAIVideo && (
                 <div>
-                  <h3 className="font-bold">AI Video Provider</hh3>
+                  <h3 className="font-bold">AI Video Provider</h3>
                   <select className="bg-gray-800 p-2 rounded w-full" value={aiVideoProvider} onChange={e=>setAiVideoProvider(e.target.value)}>
                     <option value="runway">Runway Gen-3</option>
                     <option value="pika">Pika</option>
