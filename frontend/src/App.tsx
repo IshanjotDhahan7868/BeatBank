@@ -1,19 +1,17 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Generate from "./pages/Generate";
-import History from "./pages/History";
-import Detail from "./pages/Detail";
+// src/App.tsx
+
+import { Outlet } from "react-router-dom";
+import { Toaster } from "sonner";
+import Navbar from "./components/Navbar";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/generate" element={<Generate />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/beat/:id" element={<Detail />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Navbar />
+      <Toaster richColors position="top-right" />
+      <main className="min-h-screen bg-gray-950 text-white p-6">
+        <Outlet />
+      </main>
+    </>
   );
 }
-
