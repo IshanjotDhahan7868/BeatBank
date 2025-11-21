@@ -288,6 +288,21 @@ async def ai_video_endpoint(
         return {"status": "success", **res}
     except Exception as e:
         raise HTTPException(500, f"AI video error: {e}")
+    
+
+# ----------------------------
+# HISTORY
+# ----------------------------
+@app.get("/api/history")
+async def get_history():
+    try:
+        res = supabase.table("beats").select("*").order("created_at", desc=True).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        log.exception("History fetch failed")
+        raise HTTPException(500, f"History fetch error: {e}")
+
+
 
 # ----------------------------
 # AUTO PIPELINE
@@ -443,3 +458,4 @@ async def auto_chain(
     # RETURN EVERYTHING
     # ----------------------------
     return {"status": "success", **result}
+
