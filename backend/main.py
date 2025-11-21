@@ -291,6 +291,53 @@ async def ai_video_endpoint(
     
 
 # ----------------------------
+# DETAIL
+# ----------------------------
+@app.get("/api/detail/{beat_id}")
+async def get_detail(beat_id: int):
+    try:
+        res = supabase.table("beats").select("*").eq("id", beat_id).single().execute()
+        if not res.data:
+            raise HTTPException(404, "Beat not found")
+
+        # Normalize JSON strings (common in your table)
+        row = res.data
+        title = row.get("title")
+        tags = row.get("tags")
+        description = row.get("description")
+
+        # Try parsing JSON if stored as a string
+        if isinstance(title, str) and title.strip().startswith("{"):
+            try:
+                parsed = json.loads(title)
+                title = parsed.get("title", title)
+                tags = parsed.get("tags", tags)
+                description = parsed.get("description", description)
+            except:
+                pass
+
+        return {
+            "status": "success",
+            "data": {
+                "id": row.get("id"),
+                "title": title,
+                "tags": tags,
+                "description": description,
+                "image_path": row.get("image_path"),
+                "video_path": row.get("video_path"),
+                "ai_video_path": row.get("ai_video_path"),
+                "file_name": row.get("file_name"),
+                "created_at": row.get("created_at"),
+            }
+        }
+
+    except Exception as e:
+        log.exception("Detail fetch failed")
+        raise HTTPException(500, f"Detail fetch error: {e}")
+
+
+
+# ----------------------------
 # HISTORY (fixed)
 # ----------------------------
 @app.get("/api/history")
