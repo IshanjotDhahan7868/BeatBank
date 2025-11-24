@@ -540,8 +540,4 @@ try:
 except Exception as e:
     log.info(f"Supabase insert (non-fatal): {e}")
 
-    # ----------------------------
-    # RETURN EVERYTHING
-    # ----------------------------
-    return {"status": "success", **result}
 
