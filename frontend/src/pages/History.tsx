@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../lib/api";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface Beat {
   id: number;
@@ -11,13 +12,20 @@ interface Beat {
 }
 
 export default function History() {
+  const { user } = useAuth();
   const [beats, setBeats] = useState<Beat[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user?.id) return;
+
     const load = async () => {
       try {
-        const res = await api.history();
+        const res = await api.history({
+          headers: {
+            "x-user-id": user?.id ?? "",
+          },
+        });
         setBeats(res.data || []);
       } catch (err) {
         console.error("History error:", err);
@@ -27,7 +35,7 @@ export default function History() {
     };
 
     load();
-  }, []);
+  }, [user?.id]);
 
   if (loading) return <div className="p-12 text-center text-gray-500">Loading...</div>;
   if (!beats.length)

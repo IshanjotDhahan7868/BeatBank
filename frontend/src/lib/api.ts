@@ -15,21 +15,29 @@ if (!API_BASE_URL) console.warn("⚠️ Missing VITE_API_BASE_URL in frontend/.e
 async function request(
   method: string,
   url: string,
-  body?: any,
+  body?: unknown,
   isForm: boolean = false,
-  extraOptions: any = {}
+  extraOptions: RequestInit = {}
 ) {
+  const mergedHeaders = {
+    ...(extraOptions.headers || {}),
+  } as Record<string, string>;
+
   const options: RequestInit = {
     method,
+    headers: mergedHeaders,
     ...extraOptions,
   };
 
   if (body) {
     if (isForm) {
-      options.body = body;
+      options.body = body as BodyInit;
     } else {
       options.body = JSON.stringify(body);
-      options.headers = { "Content-Type": "application/json" };
+      options.headers = {
+        ...mergedHeaders,
+        "Content-Type": "application/json",
+      };
     }
   }
 
@@ -49,28 +57,32 @@ async function request(
 
 const api = {
   // Generic POST used by some calls in your Generate page
-  post: (url: string, data: any, options?: any) =>
+  post: (url: string, data: Record<string, unknown>, options?: RequestInit) =>
     request("POST", url, data, false, options),
+
+  // Generic multipart/form-data POST
+  postForm: (url: string, form: FormData, options?: RequestInit) =>
+    request("POST", url, form, true, options),
 
   // Upload & full auto-processing: POST /api/auto
   auto: (form: FormData) =>
     request("POST", "/api/auto", form, true),
 
   // Metadata generation: POST /api/metadata
-  metadata: (data: any) =>
+  metadata: (data: Record<string, unknown>) =>
     request("POST", "/api/metadata", data),
 
   // Visualizer generation: POST /api/visualizer
-  visualizer: (data: any) =>
+  visualizer: (data: Record<string, unknown>) =>
     request("POST", "/api/visualizer", data),
 
   // History list: GET /api/history
-  history: () =>
-    request("GET", "/api/history"),
+  history: (options?: RequestInit) =>
+    request("GET", "/api/history", undefined, false, options),
 
   // Detail for single entry: GET /api/detail/:id
-  detail: (id: string) =>
-    request("GET", `/api/detail/${id}`),
+  detail: (id: string, options?: RequestInit) =>
+    request("GET", `/api/detail/${id}`, undefined, false, options),
 };
 
 export default api;

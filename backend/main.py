@@ -295,9 +295,21 @@ async def ai_video_endpoint(
 # DETAIL
 # ----------------------------
 @app.get("/api/detail/{beat_id}")
-async def get_detail(beat_id: int):
+async def get_detail(beat_id: int, request: Request):
     try:
-        res = supabase.table("beats").select("*").eq("id", beat_id).single().execute()
+        user_id = request.headers.get("x-user-id")
+        if not user_id:
+            raise HTTPException(401, "Missing x-user-id")
+
+        res = (
+            supabase
+            .table("beats")
+            .select("*")
+            .eq("id", beat_id)
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
         if not res.data:
             raise HTTPException(404, "Beat not found")
 
@@ -342,9 +354,20 @@ async def get_detail(beat_id: int):
 # HISTORY (fixed)
 # ----------------------------
 @app.get("/api/history")
-async def get_history():
+async def get_history(request: Request):
     try:
-        res = supabase.table("beats").select("*").order("id", desc=True).execute()
+        user_id = request.headers.get("x-user-id")
+        if not user_id:
+            raise HTTPException(401, "Missing x-user-id")
+
+        res = (
+            supabase
+            .table("beats")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("id", desc=True)
+            .execute()
+        )
         rows = res.data or []
 
         cleaned = []
@@ -403,6 +426,11 @@ async def auto_chain(
     duration: int = Form(30),
     audio_format: Literal["mp3", "wav", "both"] = Form("mp3"),
     provider: Literal["auto", "replicate", "local"] = Form("auto"),
+    waveform: bool = Form(True),
+    spectrum: bool = Form(False),
+    pulse: bool = Form(True),
+    zoom: bool = Form(True),
+    vhs: bool = Form(False),
 ):
 
     result = {
@@ -499,46 +527,45 @@ async def auto_chain(
                 image_path=result["image_path"],
                 audio_path=main_audio,
                 duration=duration,
-                waveform=True,
-                spectrum=False,
-                pulse=True,
-                zoom=True,
-                vhs=False,
+                waveform=waveform,
+                spectrum=spectrum,
+                pulse=pulse,
+                zoom=zoom,
+                vhs=vhs,
             )
 
             result["video_path"] = viz["video_path"]
         except Exception as e:
             log.warning(f"Visualizer failed: {e}")
 
-# ----------------------------
-# 7) SAVE TO SUPABASE
-# ----------------------------
-try:
-    user_id = request.headers.get("x-user-id")  # 🔥 ADDED
+    # ----------------------------
+    # 7) SAVE TO SUPABASE
+    # ----------------------------
+    try:
+        user_id = request.headers.get("x-user-id")
+        dsp = result["dsp"] or {}
 
-    dsp = result["dsp"] or {}
+        supabase.table("beats").insert({
+            "user_id": user_id,
+            "file_name": (result["audio_paths"] or [None])[-1],
+            "title": title[:50],
+            "tags": result["metadata"]["tags"] if result["metadata"] else ["ai"],
+            "description": desc,
+            "image_path": result["image_path"],
+            "video_path": result.get("video_path"),
+            "ai_video_path": result.get("ai_video_path"),
 
-    supabase.table("beats").insert({
-        "user_id": user_id,                                  # 🔥 ADDED
-        "file_name": (result["audio_paths"] or [None])[-1],
-        "title": title[:50],
-        "tags": result["metadata"]["tags"] if result["metadata"] else ["ai"],
-        "description": desc,
-        "image_path": result["image_path"],
-        "video_path": result.get("video_path"),
-        "ai_video_path": result.get("ai_video_path"),
+            # DSP
+            "bpm": dsp.get("bpm"),
+            "key": dsp.get("key"),
+            "energy": dsp.get("energy_rms"),
+            "brightness": dsp.get("brightness"),
+            "dynamic_range": dsp.get("dynamic_range"),
+            "tempo_stability": dsp.get("tempo_stability"),
+            "duration_sec": dsp.get("duration_sec"),
+        }).execute()
 
-        # DSP
-        "bpm": dsp.get("bpm"),
-        "key": dsp.get("key"),
-        "energy": dsp.get("energy_rms"),
-        "brightness": dsp.get("brightness"),
-        "dynamic_range": dsp.get("dynamic_range"),
-        "tempo_stability": dsp.get("tempo_stability"),
-        "duration_sec": dsp.get("duration_sec"),
-    }).execute()
+    except Exception as e:
+        log.info(f"Supabase insert (non-fatal): {e}")
 
-except Exception as e:
-    log.info(f"Supabase insert (non-fatal): {e}")
-
-
+    return {"status": "success", **result}

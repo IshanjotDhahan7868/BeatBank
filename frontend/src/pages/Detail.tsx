@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Detail() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [beat, setBeat] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!id || !user?.id) return;
+
     const load = async () => {
       try {
-        const res = await api.detail(id!);
+        const res = await api.detail(id, {
+          headers: {
+            "x-user-id": user.id,
+          },
+        });
         setBeat(res.data);
       } catch (err) {
         console.error("Detail error:", err);
@@ -20,7 +28,7 @@ export default function Detail() {
     };
 
     load();
-  }, [id]);
+  }, [id, user?.id]);
 
   if (loading) return <div className="p-12 text-center text-gray-400">Loading...</div>;
   if (!beat) return <div className="p-12 text-center text-gray-400">Not found.</div>;
