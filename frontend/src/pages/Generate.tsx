@@ -1,10 +1,13 @@
 // src/pages/Generate.tsx
 
 import { useState, useRef } from "react";
-import api, { API_BASE_URL } from "../lib/api";
-import { useAuth } from "../context/AuthContext";   // 🔥 ADDED
+import api, { API_BASE_URL, withUserHeader } from "../lib/api";
+    if (!user?.id) {
+      setError("You must be logged in to generate.");
+      return;
+    }
 
-export default function Generate() {
+        ...withUserHeader(user.id),
   const { user } = useAuth();                       // 🔥 ADDED
 
   const [prompt, setPrompt] = useState("");

@@ -85,4 +85,12 @@ const api = {
     request("GET", `/api/detail/${id}`, undefined, false, options),
 };
 
+export function withUserHeader(userId: string): RequestInit {
+  return {
+    headers: {
+      "x-user-id": userId,
+    },
+  };
+}
+
 export default api;

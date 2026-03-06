@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from "../lib/api";
-import { useAuth } from "../context/AuthContext";
-
-export default function Detail() {
-  const { id } = useParams();
-  const { user } = useAuth();
+import api, { withUserHeader } from "../lib/api";
+        const res = await api.detail(id, withUserHeader(user.id));
   const [beat, setBeat] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
-import api from "../lib/api";
+import api, { withUserHeader } from "../lib/api";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-
-interface Beat {
-  id: number;
-  title: string;
+        const res = await api.history(withUserHeader(user.id));
   description: string;
   image_path: string | null;
   created_at?: string;

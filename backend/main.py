@@ -432,6 +432,9 @@ async def auto_chain(
     zoom: bool = Form(True),
     vhs: bool = Form(False),
 ):
+    user_id = request.headers.get("x-user-id")
+    if not user_id:
+        raise HTTPException(401, "Missing x-user-id")
 
     result = {
         "prompt": prompt,
@@ -542,7 +545,6 @@ async def auto_chain(
     # 7) SAVE TO SUPABASE
     # ----------------------------
     try:
-        user_id = request.headers.get("x-user-id")
         dsp = result["dsp"] or {}
 
         supabase.table("beats").insert({
