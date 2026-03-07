@@ -1,10 +1,13 @@
 // src/pages/Generate.tsx
 
 import { useState, useRef } from "react";
-import api, { API_BASE_URL } from "../lib/api";
-import { useAuth } from "../context/AuthContext";   // 🔥 ADDED
+import api, { API_BASE_URL, withUserHeader } from "../lib/api";
+    if (!user?.id) {
+      setError("You must be logged in to generate.");
+      return;
+    }
 
-export default function Generate() {
+        ...withUserHeader(user.id),
   const { user } = useAuth();                       // 🔥 ADDED
 
   const [prompt, setPrompt] = useState("");
@@ -67,7 +70,7 @@ export default function Generate() {
       log("Sending to backend…");
 
       // 🟣 SEND USER ID TO BACKEND
-      const { data } = await api.post("/api/auto", form, {
+      const data = await api.postForm("/api/auto", form, {
         signal: controller.signal,
         headers: {
           "x-user-id": user?.id || "",
@@ -152,7 +155,6 @@ export default function Generate() {
                   <h3 className="font-bold">AI Video Provider</h3>
                   <select className="bg-gray-800 p-2 rounded w-full" value={aiVideoProvider} onChange={e=>setAiVideoProvider(e.target.value)}>
                     <option value="runway">Runway Gen-3</option>
-                    <option value="pika">Pika</option>
                   </select>
                 </div>
               )}
