@@ -93,3 +93,4 @@ input/
 __temp__/
 __cache__/
 
+frontend/.env
